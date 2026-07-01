@@ -1,17 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Swal from 'sweetalert2';
 import { buildProblemDeletePayload, deletePatientProblem, fetchPatientProblems } from '../../../services/problemService';
 import patientCache from '../../../utils/patientCache';
 import { DEBOUNCE_ALLERGY_LIST_MS } from '../../../constants/timing';
 import { useNotify } from '../../../context/NotificationContext';
 import { useIsTabletOrBelow } from '../../../hooks/useMediaQuery';
+import NoDataAvailable from '../../../components/NoDataAvailable';
+
+const swalTheme = Swal.mixin({
+    customClass: {
+        popup: 'pa-swal-popup',
+        title: 'pa-swal-title',
+        confirmButton: 'pa-swal-confirm',
+        cancelButton: 'pa-swal-cancel',
+    },
+    buttonsStyling: false,
+    showCancelButton: true,
+    reverseButtons: false,
+    allowOutsideClick: false,
+});
 const NoProblemData = ({ recordType, showDeleted }) => {
     const label = recordType === 'active' ? 'active problems' : showDeleted ? 'deleted problems' : 'history of problems';
-    return (<div className="list-wrapper" style={{ border: '2px solid #ddd', padding: '30px 20px', textAlign: 'center' }}>
-      <div className="nodata">
-        <i className="mdi mdi-information-outline" style={{ fontSize: 30, verticalAlign: 'sub' }}/>
-        <span style={{ fontSize: 20 }}> No {label} recorded yet!</span>
-      </div>
-    </div>);
+    return <NoDataAvailable desc={`No ${label} recorded yet!`} />;
 };
 const IcdCodeCell = ({ record }) => (<div>
     <div className="fw-bold text-dark pp-icd-label-value">{record.icdCode || '-'}</div>
@@ -57,26 +67,65 @@ const PatientProblemsList = ({ patientId, recordType, showDeleted, searchTerm, f
         const timerId = window.setTimeout(loadProblems, DEBOUNCE_ALLERGY_LIST_MS);
         return () => window.clearTimeout(timerId);
     }, [loadProblems, refreshKey]);
-    const handleDelete = (record) => {
-        if (!window.confirm('Are you sure about deleting the problem record?'))
-            return;
-        const changeLogNotes = window.prompt('Enter change log message for deleting this problem record:') || '';
-        if (!changeLogNotes.trim())
-            return;
-        (async () => {
-            try {
-                await deletePatientProblem(buildProblemDeletePayload({ problemRecord: record, changeLogNotes }));
-                notifySuccess('Problem record deleted.');
-                onRefresh?.();
-            }
-            catch (error) {
-                console.error('Failed to delete problem.', error);
-                notifyError(error?.message || 'Failed to delete the problem record.');
-            }
-        })();
+    const handleDelete = async (record) => {
+        const confirm = await swalTheme.fire({
+            title: 'Delete Problem Record',
+            text: 'Are you sure about deleting the problem record?',
+            confirmButtonText: 'YES',
+            cancelButtonText: 'NO',
+        });
+        if (!confirm.isConfirmed) return;
+        const autoMessage = `An existing problem "${record.icdCode}" has been deleted`;
+        try {
+            await deletePatientProblem(buildProblemDeletePayload({ problemRecord: record, changeLogNotes: autoMessage }));
+            notifySuccess('Problem record deleted.');
+            onRefresh?.();
+        } catch (error) {
+            console.error('Failed to delete problem.', error);
+            notifyError(error?.message || 'Failed to delete the problem record.');
+        }
     };
     if (loading)
-        return <div className="p-3 text-muted small">Loading problems...</div>;
+        return (
+            <div className="pa-allergy-table-outer bg-white border mt-2">
+              <div className="table-responsive">
+                <table className="table align-middle text-start mb-0">
+                    <thead className="table-light">
+                        <tr className="small text-muted">
+                            <th>S.No</th>
+                            <th style={{ width: 320 }}>ICD-10 Code</th>
+                            <th style={{ width: 300 }}>SNOMED Code</th>
+                            <th style={{ width: 90 }}>Type</th>
+                            <th>Clinical Status</th>
+                            <th>Verification Status</th>
+                            <th>Date of Diagnosis</th>
+                            <th style={{ width: 90 }} />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <tr key={i}>
+                                <td><div className="pa-skeleton-bar" style={{ width: 20 }} /></td>
+                                <td>
+                                    <div className="pa-skeleton-bar mb-2" style={{ width: 100 }} />
+                                    <div className="pa-skeleton-bar" style={{ width: 160 }} />
+                                </td>
+                                <td>
+                                    <div className="pa-skeleton-bar mb-2" style={{ width: 90 }} />
+                                    <div className="pa-skeleton-bar" style={{ width: 180 }} />
+                                </td>
+                                <td><div className="pa-skeleton-bar" style={{ width: 60 }} /></td>
+                                <td><div className="pa-skeleton-bar" style={{ width: 70 }} /></td>
+                                <td><div className="pa-skeleton-bar" style={{ width: 80 }} /></td>
+                                <td><div className="pa-skeleton-bar" style={{ width: 90 }} /></td>
+                                <td><div className="pa-skeleton-bar" style={{ width: 40 }} /></td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+              </div>
+            </div>
+        );
     if (!records.length)
         return <NoProblemData recordType={recordType} showDeleted={showDeleted}/>;
     const isDeletedRow = (record) => recordType === 'history' && record.invalidFlag === 'Y';
@@ -111,10 +160,11 @@ const PatientProblemsList = ({ patientId, recordType, showDeleted, searchTerm, f
           </div>))}
         </div>);
     }
-    return (<div className="table-scroll-container table-responsive bg-white rounded border mt-2">
+    return (<div className="pa-allergy-table-outer bg-white border mt-2">
+      <div className="table-responsive">
       <table className="table align-middle text-start mb-0">
-        <thead className="thead-border-radius table-light">
-          <tr className="small text-muted text-uppercase">
+        <thead className="table-light">
+          <tr className="small text-muted">
             <th>S.No</th>
             <th style={{ width: 320 }}>ICD-10 Code</th>
             <th style={{ width: 300 }}>SNOMED Code</th>
@@ -126,7 +176,7 @@ const PatientProblemsList = ({ patientId, recordType, showDeleted, searchTerm, f
             <th style={{ width: 90 }}/>
           </tr>
         </thead>
-        <tbody className="tbody-border-radius font-14">
+        <tbody className="font-14">
           {records.map((record, index) => (<tr key={record.diagnosisId || index} className={isDeletedRow(record) ? 'patient-chart-diagnosis-invalid-problem-record' : ''}>
               <td className="pp-problem-records-data"><span>{index + 1}</span></td>
               <td className="pp-problem-records-data"><IcdCodeCell record={record}/></td>
@@ -142,6 +192,7 @@ const PatientProblemsList = ({ patientId, recordType, showDeleted, searchTerm, f
             </tr>))}
         </tbody>
       </table>
+      </div>
     </div>);
 };
 export default PatientProblemsList;

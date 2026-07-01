@@ -211,7 +211,6 @@
 }
 
 .pa-allergy-header-recover-delete-record-group {
-    margin-top: -25px !important;
     cursor: pointer !important;
 }
 
@@ -231,42 +230,53 @@
     gap: 5px;
 }
 
-/* Offcanvas Sidebar Form Controls Override Framework */
-[id^="pa_allergy_filter_acute_chronic_options"] .offcanvas-header {
-    border: 2px solid var(--app-color13);
-    border-top-left-radius: 9px !important;
+/* Shared filter button — Allergies, Problems, and all sections */
+.section-filter-icon-btn {
+    color: var(--app-color21);
+    font-size: 14px;
 }
 
-[id^="pa_allergy_filter_acute_chronic_options"] .form-label {
-    font-weight: 500;
-    font-size: 13px;
-    line-height: 100%;
-    color : #0E2C4B;
+.section-filter-icon-btn:hover {
+    color: var(--app-color2);
 }
 
-[id^="pa_allergy_filter_acute_chronic_options"] .bs-offcanvas-reset-btn {
-    background-color: var(--app-color) !important;
-    color: var(--app-color4);
-    width: 120px;
-    border-radius: var(--app-border-radius30) !important;
-    border-color: var(--app-color4);
-    opacity: 1;
-    height: 35px !important;
-}
-
-[id^="pa_allergy_filter_acute_chronic_options"] .bs-offcanvas-reset-btn:hover {
-    color: var(--app-color2) !important;
-}
-
-[id^="pa_allergy_filter_acute_chronic_options"] .offcanvas-close-btn {
-    width: 12.5px !important;
-    height: 18px !important;
-    color: #2E384D !important;
-    margin-top: -12px !important;
-}
-
-.pa-allergy-header-offcanvas-container .offcanvas {
+/* Offcanvas Filter Panel — Allergies */
+.pa-allergy-header-offcanvas-container {
     border-top-left-radius: 10px !important;
+}
+
+/* Offcanvas Filter Panel — Problems (same theme) */
+[id^="pp_diagnosis_filter_acute_chronic_options"] {
+    & .offcanvas-header {
+        border: 2px solid var(--app-color13);
+        border-top-left-radius: 9px !important;
+    }
+
+    & .form-label {
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 100%;
+        color: #0E2C4B;
+    }
+
+    & .bs-offcanvas-reset-btn {
+        background-color: transparent !important;
+        color: var(--app-color2) !important;
+        border: 1px solid var(--app-color2) !important;
+        border-radius: var(--app-border-radius30) !important;
+        width: 120px;
+        height: 35px !important;
+    }
+
+    & .bs-offcanvas-reset-btn:hover {
+        background-color: var(--app-color40) !important;
+    }
+
+    & .bs-offcanvas-apply-btn {
+        border-radius: var(--app-border-radius30) !important;
+        width: 120px;
+        height: 35px !important;
+    }
 }
 
 /* Specific Cell Stack Reaction Width Styles */

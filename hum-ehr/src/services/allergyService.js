@@ -8,7 +8,7 @@ export const normalizeResponseList = (response) => {
 	if (Array.isArray(response.data))
 		return response.data;
 	return [];
-};
+}; 
 export const buildAllergyListRequest = ({ patientId, searchTerm = '', advancedFilters = {}, }) => ({
 	patientId,
 	search: searchTerm?.trim() || null,

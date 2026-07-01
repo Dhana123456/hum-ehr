@@ -83,11 +83,11 @@ const PatientProblems = ({ patientId }) => {
               <div className="pp-problems-header-input-group d-flex align-items-center gap-2 flex-wrap">
                 <div className="active-history-toggle-group">
                   <ul className="nav nav-pills active-history-toggle-group-list toggle-group-small" role="tablist">
-                    <li className="nav-item">
-                      <button className={`nav-link small ${recordType === 'active' ? 'active' : ''}`} onClick={() => handleRecordTypeChange('active')} type="button">Active</button>
+                    <li className="nav-item active-history-toggle-list">
+                      <button className={`nav-link active-history-nav-link small ${recordType === 'active' ? 'active' : ''}`} onClick={() => handleRecordTypeChange('active')} type="button">Active</button>
                     </li>
-                    <li className="nav-item">
-                      <button className={`nav-link small ${recordType === 'history' ? 'active' : ''}`} onClick={() => handleRecordTypeChange('history')} type="button">History</button>
+                    <li className="nav-item active-history-toggle-list">
+                      <button className={`nav-link active-history-nav-link small ${recordType === 'history' ? 'active' : ''}`} onClick={() => handleRecordTypeChange('history')} type="button">History</button>
                     </li>
                   </ul>
                 </div>
@@ -104,7 +104,7 @@ const PatientProblems = ({ patientId }) => {
               </div>
 
               <div className="pp-problems-header-action-icons-container d-flex align-items-center gap-2">
-                <button type="button" className="btn pp-diagnosis-filter-icon-btn d-flex align-items-center gap-2 btn-md border-0" onClick={() => setFilterVisible(true)}>
+                <button type="button" className="btn border-0 d-flex align-items-center gap-2 btn-md section-filter-icon-btn" onClick={() => setFilterVisible(true)}>
                   <span className="mdi mdi-filter-variant"/>Filter
                 </button>
                 {recordType !== 'history' && (<button type="button" className="pa-add-new-problem-btn btn btn-primary btn-md border-radius-button text-nowrap" id={`pp_add_new_problem_btn_${patientId}`} onClick={() => openAddEdit(null, 'create')}>

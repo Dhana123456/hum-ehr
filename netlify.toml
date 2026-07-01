@@ -1,0 +1,4 @@
+[build]
+  base    = "hum-ehr"
+  command = "npm install && npm run build"
+  publish = "hum-ehr/dist"

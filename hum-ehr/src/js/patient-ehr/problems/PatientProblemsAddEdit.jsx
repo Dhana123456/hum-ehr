@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import AsyncSelect from 'react-select/async';
 import { buildProblemSavePayload, savePatientProblem } from '../../../services/problemService';
-import { fetchProblemSnomedForIcd } from '../../../services/lookupService';
+import { fetchProblemIcdLookup, fetchProblemSnomedForIcd } from '../../../services/lookupService';
 import { getFormattedIcdCode } from '../../../utils/commonUtility';
 import { getSaveOutcome } from '../../../utils/saveResponse';
-import ProblemIcdLookupInput from './ProblemIcdLookupInput';
+import { LOOKUP_MIN_CHARS } from '../../../constants/timing';
 import FlatpickrDateTimeInput from '../../../components/common/FlatpickrDateTimeInput';
 const createDefaultForm = () => ({
     icdCode: '',
@@ -271,7 +272,41 @@ const PatientProblemsAddEdit = ({ patientId, problemRecord, actionType, statusMe
         {/* Row 1 — identification (col-md-4: 3 per row on desktop, matching the allergy form). */}
         <div className="row g-3">
           <div className="col-12 col-sm-6 col-md-4">
-            <ProblemIcdLookupInput id={fieldId('pp_patient_problem_icd_code')} label="Search By ICD Code (or) Description" required value={form.icdCode} disabled={isEditMode} placeholder="Type at least 3 characters" onChange={(value) => updateForm('icdCode', value)} onSelect={handleIcdSelect}/>
+            <label className="form-label fw-bold" htmlFor={fieldId('pp_patient_problem_icd_code')}>Search By ICD Code (or) Description <span className="text-danger">*</span></label>
+            <AsyncSelect
+              inputId={fieldId('pp_patient_problem_icd_code')}
+              cacheOptions
+              defaultOptions={false}
+              isDisabled={isEditMode}
+              loadOptions={(inputValue) => {
+                if (inputValue.trim().length < LOOKUP_MIN_CHARS) return Promise.resolve([]);
+                return fetchProblemIcdLookup(inputValue.trim())
+                  .then((res) => (res?.status === 'success' ? res.data || [] : []).map((item) => ({
+                    value: getFormattedIcdCode(item.icdCode || ''),
+                    label: `${getFormattedIcdCode(item.icdCode || '')} - ${item.icdDescription || ''}`,
+                    code: getFormattedIcdCode(item.icdCode || ''),
+                    description: item.icdDescription || '',
+                    chronicIndicator: item.chronicIndicator,
+                  })))
+                  .catch(() => []);
+              }}
+              value={form.icdCode ? { value: form.icdCode, label: `${form.icdCode} - ${form.icdDescription}` } : null}
+              onChange={(selected) => {
+                if (selected) {
+                  handleIcdSelect(selected);
+                } else {
+                  setForm((prev) => ({ ...prev, icdCode: '', icdDescription: '', diagnosisType: '', snomedCode: '', snomedDescription: '' }));
+                  setSnomedOptions([]);
+                  setNoSnomed(false);
+                  setSnomedLocked(false);
+                }
+              }}
+              isClearable
+              placeholder="Type at least 3 characters..."
+              noOptionsMessage={({ inputValue }) => inputValue.length < LOOKUP_MIN_CHARS ? `Type at least ${LOOKUP_MIN_CHARS} characters` : 'No results found'}
+              loadingMessage={() => 'Searching...'}
+              classNamePrefix="react-select"
+            />
             {errors.icdCode && <div className="small text-danger mt-1">{errors.icdCode}</div>}
             {saveError && (<div className={`small mt-1 ${saveError.tone === 'warning' ? 'text-warning' : 'text-danger'}`} id={fieldId('pp_patient_problem_save_error')}>
                 <i className="fa fa-exclamation-triangle me-1"/>{saveError.message}

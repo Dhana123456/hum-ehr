@@ -1787,3 +1787,42 @@ ehr-orders-main-element label, ehr-orders-main-element .ehr-order-summary-label 
 .p-toast.p-component {
    z-index: 100000 !important;
 }
+.offcanvas {
+    & .offcanvas-header {
+        border: 2px solid var(--app-color13);
+        border-top-left-radius: 9px !important;
+    }
+
+    & .form-label {
+        font-weight: 500;
+        font-size: 13px;
+        line-height: 100%;
+        color: #0E2C4B;
+    }
+
+    & .bs-offcanvas-reset-btn {
+        background-color: transparent !important;
+        color: var(--app-color2) !important;
+        border: 1px solid var(--app-color2) !important;
+        border-radius: var(--app-border-radius30) !important;
+        width: 120px;
+        height: 35px !important;
+    }
+
+    & .bs-offcanvas-reset-btn:hover {
+        background-color: var(--app-color40) !important;
+    }
+
+    & .bs-offcanvas-apply-btn {
+        border-radius: var(--app-border-radius30) !important;
+        width: 120px;
+        height: 35px !important;
+    }
+
+    & .offcanvas-close-btn {
+        width: 12.5px !important;
+        height: 18px !important;
+        color: #2E384D !important;
+        margin-top: -12px !important;
+    }
+}

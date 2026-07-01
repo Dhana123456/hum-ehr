@@ -25,7 +25,7 @@ const PatientListFilter = () => (<div className="offcanvas offcanvas-end" data-b
       <div className="col-md pl-none mb-1">
         <div className="form-group m-none">
           <label className="fw-bold" htmlFor="search_patients_by_column">Search By</label>
-          <select id="search_patients_by_column" name="search_patients_by_column" className="filter-inputs text-capitalize form-control" defaultValue="PATIENNAME">
+          <select id="search_patients_by_column" name="search_patients_by_column" className="filter-inputs text-capitalize form-control form-select" defaultValue="PATIENNAME">
             <option value="PATIENNAME">Patient Name</option>
             <option value="PATIENTEMR">External EMR Id</option>
             <option value="MEDICARNM">Medicare Number</option>

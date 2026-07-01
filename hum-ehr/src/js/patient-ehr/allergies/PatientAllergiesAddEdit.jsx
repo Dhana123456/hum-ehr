@@ -568,7 +568,7 @@ const PatientAllergiesAddEdit = ({ patientId, allergyRecord, actionType, recordT
 
                 <div className="row mt-4 pt-3 border-top m-0">
                     <div className="form-add-edit-button-group d-flex justify-content-end gap-2 p-0">
-                        <button type="button" className="btn btn-outline-secondary px-4 border-radius-button bs-modal-cancel-btn" onClick={() => onClose(false)} disabled={saving}>
+                        <button type="button" className="btn btn-outline-secondary px-4 border-radius-button cancel bs-modal-cancel-btn" onClick={() => onClose(false)} disabled={saving}>
                             Cancel
                         </button>
                         <button type="submit" className="btn btn-primary px-4 border-radius-button bs-modal-save-btn" disabled={saving}>
